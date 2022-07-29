@@ -1,0 +1,57 @@
+version: "3.7"
+services:
+  gk-nginx:
+    container_name: gk-nginx
+    image: nginx # Docker hub에 있는 nginx Image
+    restart: always
+    volumes:
+      - ./etc/nginx/default.conf:/etc/nginx/conf.d/default.conf # 해당 repository의 default.conf를 gk-nginx의 nginx Image의 default.conf로 업데이트
+      - gksocket:/tmp # gksocket volume을 만들고, tmp 경로와 연결 # gk-web의 tmp 경로와 gk-nginx의 tmp 경로는 gksocket에 mount
+    networks: # gk-nginx, gk-web, gk-db가 같은 네트워크(gk-net)에 속한다
+      - gknet
+    depends_on: # gk-web이 가동된 후 gk-web이 가동된다
+      - gk-web
+    ports: # 80포트로 접속하면 nginx로 라우팅
+      - 80:80
+  gk-web: # 서비스 이름
+    container_name: gk-web # 컨테이너 이름
+    image: gk-web
+    build: . # build할 docker 파일 위치
+    networks: # gk-nginx, gk-web, gk-db가 같은 네트워크(gk-net)에 속한다
+      - gknet
+    ports:
+      - 8080:8080
+    depends_on: # gk-db가 가동된 후 gk-web이 가동된다
+      - gk-db
+    volumes:
+      - ./:/var/www/googlekeep # 프로젝트 소스 내 모든 것들을 Docker Image 내의 googlekeep 프로젝트에 mapping(mount)
+      - gksocket:/tmp # gk-web의 tmp 경로와 gk-nginx의 tmp 경로는 gksocket에 mount
+    restart: always # 오류가 발생했을 때 항상 재시동
+    environment:
+      - FLASK_APP=googlekeep
+      - FLASK_ENV=${FLASK_ENV:-development} # FLASK_ENV는 외부에서 컨트롤 할 수 있는 환경변수로 받아준다 # default: development
+      - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI} # SQLALCHEMY_DATABASE_URI는 외부에서 컨트롤 할 수 있는 환경변수로 받아준다
+    command: ["sh", "./etc/docker-entrypoint.sh"] # 'sh': bin/bash 사용 # etc 폴더 내의 docker-entrypoint.sh 파일 사용
+  gk-db:
+    container_name: gk-db # 컨테이너 이름
+    image: mysql:5.7 # Docker hub에 있는 mysql 5.7
+    networks: # gk-nginx, gk-web, gk-db가 같은 네트워크(gk-net)에 속한다
+      - gknet
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: googlekeep
+    command:
+      - --character-set-server=utf8
+      - --collation-server=utf8_general_ci
+    ports:
+      - 3306:3306
+    volumes: # 기존에는 DB가 영구적으로 보존되지 않았지만, 영구보존을 시키기 위해서 볼륨 제작
+      - gkvolume:/var/lib/mysql # MySQL의 Image에 있는 /var/lib/mysql 디렉토리에 mount -> Docker Image/Docker Container에 적재되는 데이터들은 gkvolume에 정의 # gkvolume을 삭제하기 전까지 영구적으로 보존
+    restart: always
+
+networks:
+  gknet:
+
+volumes: # volume 자원 공유
+  gkvolume:
+  gksocket:
