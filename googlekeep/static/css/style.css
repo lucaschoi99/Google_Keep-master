@@ -4,11 +4,14 @@
   --global-grey-color: #e0e0e0;
   --global-light-grey-color: #f1f3f4;
   --global-white-color: #fff;
-  --global-sub-color: #fbbc04;
-  --global-active-color: #feefc3;
+  --global-sub-color: #eba937;
+  --global-active-color: #eba937;
 }
 
 /*======== GLOBAL =========*/
+a {
+  text-decoration: none;
+}
 
 ul {
   padding: 0;
@@ -19,14 +22,6 @@ ul {
 .mdl-dialog {
   padding: 0;
   border-radius: 10px;
-}
-
-#logoTitle {
-  font-family: Georgia, 'Times New Roman', Times, serif;
-}
-
-.mdl-layout-title {
-  font-family: Georgia, 'Times New Roman', Times, serif;
 }
 
 .mdl-card-wide {
@@ -67,9 +62,12 @@ ul {
 
 .mdl-layout__header {
   background-color: var(--global-white-color);
-  font-family: Georgia, 'Times New Roman', Times, serif;
 }
 
+.mdl-layout-title {
+  font-family: "Dancing Script", cursive;
+  font-size: 30px;
+}
 
 .material-icons,
 .material-icons-outlined {
@@ -107,7 +105,7 @@ ul {
   flex-grow: 2;
 }
 
-#navActions>button {
+#navActions > button {
   margin: 0 5px;
 }
 
@@ -123,7 +121,7 @@ ul {
   border-radius: 10px;
 }
 
-#searchBox>button {
+#searchBox > button {
   margin: 0 10px;
 }
 
@@ -202,7 +200,7 @@ ul {
   border: 1px solid var(--global-grey-color);
 }
 
-#controller>span {
+#controller > span {
   align-self: center;
   padding: 12px 0;
 }
@@ -343,7 +341,7 @@ ul {
   position: relative;
 }
 
-#container .item-label-li>label {
+#container .item-label-li > label {
   display: inline-block;
   width: 85%;
   margin-left: 10px;
@@ -361,7 +359,7 @@ ul {
   padding: 0 15px;
 }
 
-#container .item-label-li>label>input[type="checkbox"] {
+#container .item-label-li > label > input[type="checkbox"] {
   vertical-align: middle;
   margin-bottom: 6px;
   margin-right: 5px;
@@ -386,7 +384,6 @@ ul {
 }
 
 @media screen and (max-width: 1350px) {
-
   #container .item,
   #container .sizer {
     width: 32%;
@@ -394,7 +391,6 @@ ul {
 }
 
 @media screen and (max-width: 1070px) {
-
   #container .item,
   #container .sizer {
     width: 48%;
@@ -420,18 +416,15 @@ ul {
     width: 100%;
     text-align: left;
   }
-
   #sidemenu.inactive {
     overflow: hidden;
   }
-
   #content {
     margin-left: 48px;
   }
 }
 
 @media screen and (max-width: 670px) {
-
   #container .item,
   #container .sizer {
     width: 99%;
@@ -472,4 +465,5 @@ ul {
   width: 100%;
   padding: 18px;
   resize: none;
+  font-family: "Roboto";
 }
