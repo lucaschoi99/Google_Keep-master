@@ -9,6 +9,14 @@ memos_labels = db.Table(
         'label.id'), primary_key=True)
 )
 
+likes = db.Table(
+    'likes',
+    db.Column('user_id', db.Integer, db.ForeignKey(
+        'user.id'), primary_key=True),
+    db.Column('memo_id', db.Integer, db.ForeignKey(
+        'memo.id'), primary_key=True)
+)
+
 
 class Memo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -16,7 +24,6 @@ class Memo(db.Model):
     content = db.Column(db.Text, nullable=False)
     linked_image = db.Column(db.String(200), nullable=True)
     is_deleted = db.Column(db.Boolean(), nullable=False, default=False)
-    liked = db.Column(db.Integer, nullable=True, default=0)
     created_at = db.Column(db.DateTime(), default=func.now())
     updated_at = db.Column(
         db.DateTime(), default=func.now(), onupdate=func.now())
@@ -33,3 +40,7 @@ class Memo(db.Model):
         secondary=memos_labels,
         backref=db.backref('memos')
     )
+    likes = db.relationship(
+        'User',
+        secondary=likes,
+        backref=db.backref('users'))
