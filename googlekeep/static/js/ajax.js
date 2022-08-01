@@ -29,8 +29,6 @@ const MEMO = (function () {
   let LABEL = null;
   // 라벨 데이터 메모리에 저장
   let MEMORY_LABELS = [];
-  // 좋아요 수
-  let LIKED = 0;
 
   /* 셀럭터 */
   const $modalEdit = $("#modalEdit");
@@ -43,7 +41,6 @@ const MEMO = (function () {
   const $content = $("#content");
   const $layout = $(".mdl-layout__content");
   const $customActions = $("#customActions");
-  // const $modalLikes = $();
 
   /* 검색 파라미터 */
   const _getParams = function () {
@@ -53,7 +50,6 @@ const MEMO = (function () {
       needle: NEEDLE,
       label: LABEL,
       is_deleted: IS_DELETED,
-      liked: LIKED,
     };
   };
 
@@ -117,7 +113,7 @@ const MEMO = (function () {
       el.id +
       ')">';
     labelHtml += '<span class="sidemenu-icon material-icons-outlined">';
-    labelHtml += "emoji_nature";
+    labelHtml += "hive";
     labelHtml += "</span>";
     labelHtml += '<span class="sidemenu-title">';
     labelHtml += el.content;
@@ -192,21 +188,12 @@ const MEMO = (function () {
       ');">';
     itemHtml += '<i class="material-icons-outlined">layers_clear</i>';
     itemHtml += "</button>";
-
-
-    // ------- 좋아요 ------- //
-    itemHtml +=
-      '<button id="itemLabelBtn' +
-      el.id +
-      '" class="mdl-button mdl-js-button mdl-js-ripple-effect" onclick="MEMO.thumbsCount(event, ' +
-      el.id +
-      ');">';
-    itemHtml += '<i class="material-icons-outlined">👍</i>';
+    itemHtml += `<button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" onclick="MEMO.likes(${el.id});">`;
+    itemHtml += `<i class="material-icons">mood</i>`;
     itemHtml += "</button>";
+    console.log(el.likes.length);
+    itemHtml += `<span class="likes">${el.likes.length}</span>`;
     itemHtml += "</div>";
-    // ------------- //
-
-
     itemHtml += '<div class="mdl-card__menu">';
     if (IS_DELETED) {
       itemHtml +=
@@ -234,7 +221,7 @@ const MEMO = (function () {
     html += '<div class="item item-full">';
     html += '<span class="sidemenu-icon material-icons-outlined">';
     html += "info";
-    html += "<span> 추가 로드할 데이터 없음</span>";
+    html += "<span> 꿀이 부족합니다..</span>";
     html += "</span>";
     html += "</div>";
     return html;
@@ -246,7 +233,7 @@ const MEMO = (function () {
     html += '<div class="item item-full" onclick="MEMO.getMemos(this);">';
     html += '<span class="sidemenu-icon material-icons-outlined">';
     html += "hourglass_top";
-    html += "<span> 추가 로드하기</span>";
+    html += "<span> 꿀팁 더보기</span>";
     html += "</span>";
     html += "</div>";
     return html;
@@ -485,7 +472,6 @@ const MEMO = (function () {
     }
   };
 
-
   /* 라벨 복수 조회 */
   const getLabels = function () {
     /*  GET /api/labels */
@@ -600,6 +586,24 @@ const MEMO = (function () {
     });
   };
 
+  const likes = (id) => {
+    const $item = $("#item" + id);
+
+    $.ajax({
+      url: "/api/memos/" + id + "/likes",
+      type: "post",
+      success: (r) => {
+        $item.find(".likes").html(r);
+      },
+      error: (e) => {
+        alert(e.responseText);
+      },
+      complete: () => {
+        _resetGridLayout;
+      },
+    });
+  };
+
   /* 메모 검색 조회 */
   const getMemosByNeedle = function (needle) {
     STATUS = true;
@@ -657,15 +661,6 @@ const MEMO = (function () {
     $itemLabels.find(".item-labels").prepend(html);
   };
 
-  // const thumbsCount = function (e, memo_id) {
-  //   e.preventDefault();
-
-  //   data = _getParams();
-  //   data.liked += 1;
-  //   // thisMemo.liked += 1;
-
-  // }
-
   return {
     getMemo: getMemo,
     getMemos: getMemos,
@@ -684,7 +679,7 @@ const MEMO = (function () {
     attachLabels: attachLabels,
     deleteLabel: deleteLabel,
     addLabel: addLabel,
-    // thumbsCount: thumbsCount,
     init: init,
+    likes: likes,
   };
 })();
